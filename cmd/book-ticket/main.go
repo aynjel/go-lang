@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"strings"
 	"sync"
+	"test-app/pkg/helper"
 	"time"
 )
 
@@ -29,7 +29,7 @@ func main() {
 
 		firstName, lastName, email, userTicketNumber := getUserInput()
 
-		isValidName, isValidEmail, isValidUserTicketNumber := validateUserInput(firstName, lastName, email, userTicketNumber)
+		isValidName, isValidEmail, isValidUserTicketNumber := helper.ValidateUserInput(firstName, lastName, email, userTicketNumber, remainingTickets)
 
 		if isValidName && isValidEmail && isValidUserTicketNumber {
 			bookTicket(userTicketNumber, firstName, lastName, email)
@@ -96,7 +96,7 @@ func getUserInput() (string, string, string, uint) {
 
 func bookTicket(userTicketNumber uint, firstName string, lastName string, email string) {
 	remainingTickets = remainingTickets - userTicketNumber
-	var userData = UserData{
+	userData := UserData{
 		firstName: firstName,
 		lastName:  lastName,
 		email:     email,
@@ -111,15 +111,9 @@ func bookTicket(userTicketNumber uint, firstName string, lastName string, email 
 }
 
 func sendTicket(userTickets uint, firstName string, lastName string, email string) {
-	defer wg.Done()
 	time.Sleep(2 * time.Second)
-	fmt.Printf("Sending ticket to %s %s for %d tickets to %s at %s\n", firstName, lastName, userTickets, conferenceName, email)
-}
-
-func validateUserInput(firstName string, lastName string, email string, userTicketNumber uint) (bool, bool, bool) {
-	isValidName := len(firstName) >= 3 && len(lastName) >= 3
-	isValidEmail := strings.Contains(email, "@")
-	isValidUserTicketNumber := userTicketNumber > 0 && userTicketNumber <= remainingTickets
-
-	return isValidName, isValidEmail, isValidUserTicketNumber
+	ticket := fmt.Sprintf("Hi %s, thanks for purchasing %d tickets to %s!", firstName, userTickets, conferenceName)
+	fmt.Printf("Sending ticket to %s...\n", email)
+	fmt.Println(ticket)
+	wg.Done()
 }
