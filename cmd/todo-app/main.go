@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -16,11 +17,14 @@ type Todo struct {
 var todos = []Todo{}
 
 func main() {
+	fmt.Println("Starting server on port 9090...")
 	router := gin.Default()
 
 	router.GET("/", getTodos)
 	router.GET("/:id", getTodo)
-	router.POST("/create", createTodo)
+	router.POST("/create", func(c *gin.Context) {
+		go createTodo(c)
+	})
 	router.PATCH("/:id", toggleTodoCompleted)
 	router.DELETE("/:id", deleteTodo)
 
